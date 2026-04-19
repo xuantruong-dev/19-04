@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chúc Mừng Sinh Nhật - 1904</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pink-primary: #ff85a2;
+            --pink-secondary: #ffb7c5;
+            --pink-dark: #f06292;
+        }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Màn hình mật khẩu */
+        #password-screen {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(255, 133, 162, 0.3);
+            text-align: center;
+            z-index: 100;
+            transition: all 0.5s ease;
+        }
+
+        .input-pwd {
+            border: 2px solid var(--pink-secondary);
+            border-radius: 10px;
+            padding: 10px;
+            width: 150px;
+            text-align: center;
+            font-size: 1.2rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .input-pwd:focus {
+            border-color: var(--pink-primary);
+        }
+
+        .btn-open {
+            background-color: var(--pink-primary);
+            color: white;
+            padding: 10px 25px;
+            border-radius: 10px;
+            margin-top: 15px;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.3s;
+            border: none;
+        }
+
+        .btn-open:hover {
+            background-color: var(--pink-dark);
+            transform: scale(1.05);
+        }
+
+        /* Màn hình Video */
+        #video-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            z-index: 50;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        #birthday-video {
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(255, 133, 162, 0.5);
+            border: 5px solid #fffdf2;
+            max-width: 90vw;
+            max-height: 70vh;
+            background-color: #000;
+            object-fit: cover;
+        }
+
+        /* Hiệu ứng nền sinh nhật */
+        .balloon {
+            position: absolute;
+            bottom: -100px;
+            width: 40px;
+            height: 50px;
+            background: #ff85a2;
+            border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+            animation: flyUp linear infinite;
+            opacity: 0.8;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .balloon::before {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-bottom: 10px solid inherit;
+        }
+        .balloon::after {
+            content: '';
+            position: absolute;
+            bottom: -40px;
+            left: 50%;
+            width: 1px;
+            height: 40px;
+            background: rgba(0,0,0,0.3);
+        }
+        @keyframes flyUp {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-120vh) rotate(15deg); opacity: 0; }
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f2d74e;
+            top: -10px;
+            z-index: 1;
+            animation: fall linear forwards;
+            pointer-events: none;
+        }
+        @keyframes fall {
+            to { transform: translateY(100vh) rotate(720deg); }
+        }
+
+        /* Phần chứa nội dung chính */
+        #main-content {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .envelope-wrapper {
+            position: relative;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: transform 0.8s ease;
+        }
+
+        /* TỔNG THỂ PHONG BÌ */
+        .envelope {
+            position: relative;
+            width: 300px;
+            height: 200px;
+            background: var(--pink-primary); /* Mặt sau của phong bì */
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Mặt trước (Túi đựng) của phong bì */
+        .envelope::before {
+            content: "";
+            position: absolute;
+            bottom: 0; left: 0;
+            border-left: 150px solid var(--pink-secondary);
+            border-right: 150px solid var(--pink-secondary);
+            border-bottom: 100px solid var(--pink-secondary);
+            border-top: 100px solid transparent;
+            border-radius: 0 0 10px 10px;
+            z-index: 4;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        /* Nắp phong bì */
+        .flap {
+            position: absolute;
+            top: 0; left: 0;
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            border-top: 110px solid var(--pink-primary);
+            transform-origin: top;
+            transition: transform 0.6s ease, opacity 0.4s ease;
+            z-index: 5;
+        }
+
+        /* LÁ PHIẾU BÊN TRONG */
+        .letter {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%); /* Căn giữa hoàn hảo */
+            width: 280px;
+            height: 180px;
+            background: #fffdf2;
+            border-radius: 15px;
+            padding: 20px;
+            padding-bottom: 30px;
+            box-sizing: border-box;
+            transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 3;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            text-align: center;
+            
+            /* Hoa văn sinh nhật mờ */
+            background-image: 
+                radial-gradient(circle at 20px 20px, #ffb7c5 2px, transparent 0),
+                radial-gradient(circle at 40px 40px, #ffb7c5 2px, transparent 0);
+            background-size: 60px 60px;
+            border: 2px dashed #ff85a2;
+        }
+
+        /* ================= HIỆU ỨNG MỞ THƯ ================= */
+        
+        /* Bước 1: Mở nắp */
+        .envelope.flap-open .flap {
+            transform: rotateX(180deg);
+            z-index: 1;
+        }
+
+        /* Bước 2: Kéo thư trượt hẳn lên trên (vẫn nằm trong túi phong bì) */
+        .envelope.letter-up .letter {
+            bottom: 100px; 
+            height: 380px; 
+            width: 290px;
+        }
+
+        /* Bước 3: Biến mặt sau bìa thư thành phông nền ôm lấy lá thư */
+        .envelope.letter-front {
+            width: 340px;
+            height: 480px;
+            border-radius: 15px; /* Bo góc đều thành một tấm nền hoàn chỉnh */
+            background: var(--pink-primary);
+            box-shadow: 0 20px 50px rgba(255, 133, 162, 0.4);
+        }
+
+        /* Làm mờ các nắp túi thừa đi để chừa lại khung nền sạch sẽ */
+        .envelope.letter-front::before,
+        .envelope.letter-front .flap {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Đưa lá thư nằm ngay ngắn vào giữa phông nền */
+        .envelope.letter-front .letter {
+            bottom: 20px; /* Căn giữa: (480 - 440) / 2 = 20px */
+            height: 440px; 
+            width: 300px;
+            z-index: 10;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            border: 3px solid #ff85a2;
+        }
+
+        /* Căn chỉnh lại cả cụm ở giữa màn hình và phóng to nhẹ một chút */
+        .envelope-wrapper.is-open {
+            transform: scale(1.1) translateY(10px); 
+        }
+
+        .letter-content {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.2rem;
+            color: #444;
+            line-height: 1.6;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+            margin-top: 15px;
+        }
+
+        .envelope.letter-front .letter-content {
+            opacity: 1;
+        }
+
+        /* Thêm CSS cho con trỏ nhấp nháy */
+        .cursor {
+            display: inline-block;
+            font-weight: bold;
+            color: #ff85a2;
+            animation: blink 0.8s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .heart-icon {
+            color: var(--pink-primary);
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        #error-msg {
+            color: #d32f2f;
+            font-size: 0.8rem;
+            margin-top: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background music (Nhạc thư) -->
+    <audio id="bg-music" loop preload="auto">
+        <source src="https://ia801501.us.archive.org/30/items/HappyBirthdayToYou_808/Happy_Birthday_To_You.mp3" type="audio/mpeg">
+        <source src="https://assets.mixkit.co/music/preview/mixkit-happy-birthday-to-you-beat-57.mp3" type="audio/mpeg">
+        <source src="https://upload.wikimedia.org/wikipedia/commons/3/33/Happy_Birthday_To_You_-_piano.ogg" type="audio/ogg">
+    </audio>
+
+    <!-- Password Screen -->
+    <div id="password-screen">
+        <div class="heart-icon">❤️</div>
+        <h2 class="text-2xl font-bold text-pink-500 mb-4">Chào Cậu!</h2>
+        <p class="mb-4 text-gray-600">Hãy nhập ngày sinh/mật khẩu để mở món quà nhé</p>
+        <input type="password" id="password-input" class="input-pwd" placeholder="****" maxlength="4">
+        <div id="error-msg">Mật khẩu không đúng rồi, thử lại nhé!</div>
+        <br>
+        <button class="btn-open font-semibold" onclick="checkPassword()">Mở Quà</button>
+    </div>
+
+    <!-- Video Screen -->
+    <div id="video-screen">
+        <video id="birthday-video" playsinline preload="auto">
+            <source src="7741124653406.mp4" type="video/mp4">
+            Trình duyệt của bạn không hỗ trợ video.
+        </video>
+        <button class="btn-open font-semibold mt-6 flex items-center gap-2" onclick="skipVideo()">
+            Tiếp tục mở quà 🎁
+        </button>
+    </div>
+
+    <!-- Main Content (Letter) -->
+    <div id="main-content">
+        <h1 class="text-3xl font-bold text-pink-600 mb-4 drop-shadow-sm">Happy Birthday! 🎂</h1>
+        
+        <div class="envelope-wrapper" id="envelope-wrapper" onclick="openLetter()">
+            <div class="envelope" id="envelope">
+                <div class="flap"></div>
+                <!-- Tem thư -->
+                <div class="absolute top-[40px] left-1/2 transform -translate-x-1/2 z-10 w-12 h-12 bg-pink-400 rounded-full flex items-center justify-center text-white text-xl shadow-md border-2 border-white transition-opacity duration-300" id="stamp">💖</div>
+                
+                <div class="letter">
+                    <!-- Icon trang trí sinh nhật ở 4 góc -->
+                    <div class="absolute top-3 left-3 text-3xl opacity-90 animate-pulse">🎈</div>
+                    <div class="absolute top-3 right-3 text-3xl opacity-90 animate-bounce">🎁</div>
+                    <div class="absolute bottom-3 left-3 text-3xl opacity-90"></div>
+                    <div class="absolute bottom-3 right-3 text-3xl opacity-90"></div>
+                    
+                    <!-- Icon bánh sinh nhật trung tâm -->
+                    <div class="text-5xl mt-1 mb-2 transform transition-transform duration-500 hover:scale-110 drop-shadow-md"></div>
+
+                    <div class="letter-content" id="custom-text">
+                        <!-- Nội dung sẽ được ghi đè bởi JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <p id="instruction-text" class="mt-40 text-pink-500 italic animate-bounce font-medium text-lg transition-opacity duration-500">Chạm vào lá thư để đọc...</p>
+    </div>
+
+    <script>
+        const CORRECT_PWD = "1904";
+        const music = document.getElementById('bg-music');
+        const video = document.getElementById('birthday-video');
+
+        function createBalloons() {
+            const colors = ['#ff85a2', '#ffb7c5', '#f06292', '#ba68c8', '#64b5f6', '#ffd54f'];
+            setInterval(() => {
+                const balloon = document.createElement('div');
+                balloon.classList.add('balloon');
+                balloon.style.left = Math.random() * 100 + 'vw';
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                balloon.style.backgroundColor = color;
+                balloon.style.borderBottomColor = color; 
+                balloon.style.animationDuration = (Math.random() * 5 + 6) + 's';
+                document.body.appendChild(balloon);
+                setTimeout(() => balloon.remove(), 12000);
+            }, 1000);
+        }
+
+        function createConfetti() {
+            const colors = ['#f2d74e', '#95c3de', '#ff9a91', '#f06292', '#ba68c8'];
+            setInterval(() => {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                document.body.appendChild(confetti);
+                setTimeout(() => confetti.remove(), 5000);
+            }, 200);
+        }
+
+        function checkPassword() {
+            const input = document.getElementById('password-input').value;
+            const error = document.getElementById('error-msg');
+            const pwdScreen = document.getElementById('password-screen');
+            const videoScreen = document.getElementById('video-screen');
+
+            if (input === CORRECT_PWD) {
+                // 1. ÉP PHÁT VIDEO NGAY LẬP TỨC TRONG SỰ KIỆN CLICK (KHÔNG DELAY)
+                let playPromise = video.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(e => {
+                        console.log("Trình duyệt chặn autoplay: ", e);
+                        // Bật thanh điều khiển dự phòng nếu vẫn bị chặn
+                        video.controls = true; 
+                    });
+                }
+
+                // 2. Ẩn màn hình mật khẩu và chuyển sang màn hình video
+                pwdScreen.style.opacity = '0';
+                setTimeout(() => {
+                    pwdScreen.style.display = 'none';
+                    videoScreen.style.display = 'flex';
+                    // Hiệu ứng fade in cho màn hình video
+                    setTimeout(() => videoScreen.style.opacity = '1', 50);
+                    
+                    // Reset video về đầu đề phòng video đã chạy trước 0.5s chuyển màn hình
+                    video.currentTime = 0;
+
+                    // Lắng nghe sự kiện video kết thúc
+                    video.onended = showLetterScreen;
+                }, 500);
+            } else {
+                error.style.display = 'block';
+                document.getElementById('password-input').value = '';
+                document.getElementById('password-input').focus();
+            }
+        }
+
+        function skipVideo() {
+            video.pause(); // Dừng video nếu đang chạy
+            showLetterScreen();
+        }
+
+        function showLetterScreen() {
+            const videoScreen = document.getElementById('video-screen');
+            const mainContent = document.getElementById('main-content');
+
+            // Ẩn màn hình video và hiện phần lá thư
+            videoScreen.style.opacity = '0';
+            setTimeout(() => {
+                videoScreen.style.display = 'none';
+                mainContent.style.display = 'flex';
+                
+                // Kích hoạt pháo giấy và bong bóng
+                createBalloons();
+                createConfetti();
+            }, 500);
+        }
+
+        function openLetter() {
+            const envelope = document.getElementById('envelope');
+            const wrapper = document.getElementById('envelope-wrapper');
+            const stamp = document.getElementById('stamp');
+            const text = document.getElementById('instruction-text');
+            
+            if (envelope.classList.contains('flap-open')) return;
+
+            // KÍCH HOẠT NHẠC PIANO NGAY KHI CHẠM MỞ THƯ
+            music.volume = 1.0;
+            let playPromise = music.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(e => console.log("Trình duyệt chặn âm thanh:", e));
+            }
+
+            // BƯỚC 1: Mở nắp thư
+            envelope.classList.add('flap-open');
+            if (stamp) stamp.style.opacity = '0';
+            if (text) text.style.opacity = '0'; // Ẩn chữ "chạm vào lá thư..."
+
+            // BƯỚC 2: Kéo thư lên
+            setTimeout(() => {
+                envelope.classList.add('letter-up');
+            }, 600);
+
+            // BƯỚC 3: Mở rộng bìa thư thành nền và căn giữa lá thư
+            setTimeout(() => {
+                envelope.classList.add('letter-front');
+                wrapper.classList.add('is-open');
+                
+                // BƯỚC 4: Bắt đầu hiệu ứng gõ chữ sau khi thư đã mở xong (chờ 800ms)
+                setTimeout(typeWriter, 800);
+            }, 1400);
+        }
+
+        document.getElementById('password-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                checkPassword();
+            }
+        });
+
+        // Tùy chỉnh nội dung lời chúc
+        let letterContent = `
+           <span class="text-pink-600 font-bold text-2xl">Gửi cậu gì đó xinh gái,</span><br><br>
+            Đố cậu biết nay là ngày gì?.<br>
+            Tiết lộ cho cậu đó ngày xuất hiện một thiên thần này kkk.<br>
+            Cậu thêm 1 tuổi mà vẫn đáng yêu quá mức cho phép rồi đó.<br>
+            Chúc cậu luôn xinh đẹp, tự tin và rạng rỡ.<br>
+            Mong là tuổi mới bạn luôn vui vẻ, hay cười, và lúc nào cũng xinh xắn như hôm nay ✨<br><br>
+            <span class="text-pink-500 font-bold text-xl drop-shadow-sm">Happy Birthday! 🌸</span>
+        `;
+
+
+        // Hiệu ứng gõ chữ (Typewriter)
+        let textIndex = 0;
+        function typeWriter() {
+            if (textIndex < letterContent.length) {
+                // Bỏ qua các thẻ HTML để không in ra các ký tự mã code (<, s, p, a, n...)
+                if (letterContent.charAt(textIndex) === '<') {
+                    while (textIndex < letterContent.length && letterContent.charAt(textIndex) !== '>') {
+                        textIndex++;
+                    }
+                }
+                textIndex++;
+                document.getElementById('custom-text').innerHTML = letterContent.substring(0, textIndex) + '<span class="cursor">|</span>';
+                
+                // Tốc độ gõ chữ là 50 mili-giây cho mỗi chữ
+                setTimeout(typeWriter, 50);
+            } else {
+                // Xóa con trỏ nhấp nháy khi đã gõ xong toàn bộ
+                document.getElementById('custom-text').innerHTML = letterContent;
+            }
+        }
+    </script>
+</body>
+</html>
